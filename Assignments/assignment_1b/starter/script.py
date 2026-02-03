@@ -28,7 +28,11 @@ def hash160(data: bytes) -> bytes:
     # TODO: Implement hash160
     # 1. Hash the data with SHA256
     # 2. Hash the result with RIPEMD160
-    # Hint: Use hashlib.sha256() and hashlib.new('ripemd160')
+    #
+    # Hint: Try hashlib.new('ripemd160'), but on some systems (Ubuntu 22.04)
+    # RIPEMD160 is disabled. Use try/except and fall back to pycryptodome:
+    #   from Crypto.Hash import RIPEMD160
+    #   RIPEMD160.new(data).digest()
     pass
 
 
