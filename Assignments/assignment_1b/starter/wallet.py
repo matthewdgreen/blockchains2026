@@ -2,7 +2,7 @@ from typing import List, Optional
 from nacl.signing import SigningKey
 from nacl.encoding import HexEncoder
 
-from script import Script, hash160
+from script import Script, sha256_hash
 from transaction import Input, Output, Transaction
 
 """

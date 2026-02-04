@@ -1,6 +1,6 @@
 from typing import Optional, List, Union
 
-from script import Script, ScriptInterpreter, hash160
+from script import Script, verify_p2pkh
 from transaction import Transaction, Output, Input, DIFFICULTY, BLOCK_REWARD
 from block import Block
 from blockchain import Blockchain
@@ -157,7 +157,7 @@ class Node:
 
     def is_transaction_valid(self, tx: Transaction, blockchain: Blockchain, is_coinbase_allowed: bool = False) -> bool:
         """
-        Validate a transaction using Bitcoin Script execution.
+        Validate a transaction.
 
         For coinbase transactions:
         - Must have no inputs (check tx.is_coinbase())
@@ -166,16 +166,22 @@ class Node:
 
         For regular transactions:
         1. Find the UTXO being spent for each input
-        2. Combine scriptSig (unlocking) + scriptPubKey (locking)
-        3. Execute the combined script using ScriptInterpreter
-        4. Input total must equal output total (no inflation)
+        2. Extract signature and pubkey from scriptSig (input.script_sig.elements)
+        3. Extract expected pubkey hash from scriptPubKey (input.output.script_pubkey.elements[2])
+        4. Use verify_p2pkh() to validate the signature
+        5. Input total must equal output total (no inflation)
 
         Also check:
         - No double-spending within the transaction
         """
-        # TODO: Implement transaction validation with script execution
-        # Hint: Use ScriptInterpreter to execute combined scripts
+        # TODO: Implement transaction validation
         # Hint: Check tx.is_coinbase() first and handle separately
+        # Hint: For regular transactions, extract from scripts:
+        #       - signature = bytes.fromhex(input.script_sig.elements[0])
+        #       - pubkey = bytes.fromhex(input.script_sig.elements[1])
+        #       - expected_hash = bytes.fromhex(input.output.script_pubkey.elements[2])
+        #       - tx_data = bytes.fromhex(tx.bytes_to_sign())
+        # Hint: Use verify_p2pkh(signature, pubkey, expected_hash, tx_data)
         pass
 
     def update_utxos(self, blockchain: Blockchain, tx: Transaction):
