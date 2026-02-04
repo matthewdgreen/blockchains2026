@@ -7,32 +7,62 @@ from nacl.exceptions import BadSignatureError
 Bitcoin Script implementation for P2PKH (Pay to Public Key Hash).
 
 This is a simplified, educational version using human-readable opcodes.
+
+=== ASSIGNMENT STRUCTURE ===
+
+REQUIRED: Implement verify_p2pkh() - a simple, direct validation function
+          that checks P2PKH transactions without stack manipulation.
+
+EXTRA CREDIT: Implement ScriptInterpreter - a full stack-based script
+              interpreter that can execute Bitcoin-like scripts.
 """
 
 # Opcodes (simplified, human-readable)
 OP_DUP = 'OP_DUP'
-OP_HASH160 = 'OP_HASH160'
+OP_SHA256 = 'OP_SHA256'
 OP_EQUALVERIFY = 'OP_EQUALVERIFY'
 OP_CHECKSIG = 'OP_CHECKSIG'
 
 # Set of all opcodes for easy checking
-OPCODES = {OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG}
+OPCODES = {OP_DUP, OP_SHA256, OP_EQUALVERIFY, OP_CHECKSIG}
 
 
-def hash160(data: bytes) -> bytes:
+def sha256_hash(data: bytes) -> bytes:
     """
-    RIPEMD160(SHA256(data)) - Bitcoin's standard hash for public keys.
+    SHA256 hash for public keys.
 
     This is used to create the public key hash in P2PKH transactions.
+    (Bitcoin uses RIPEMD160(SHA256), but we use plain SHA256 for simplicity.)
     """
-    # TODO: Implement hash160
-    # 1. Hash the data with SHA256
-    # 2. Hash the result with RIPEMD160
-    #
-    # Hint: Try hashlib.new('ripemd160'), but on some systems (Ubuntu 22.04)
-    # RIPEMD160 is disabled. Use try/except and fall back to pycryptodome:
-    #   from Crypto.Hash import RIPEMD160
-    #   RIPEMD160.new(data).digest()
+    # TODO: Implement sha256_hash
+    # Hint: Use hashlib.sha256(data).digest()
+    pass
+
+
+def verify_p2pkh(signature: bytes, pubkey: bytes, expected_pubkey_hash: bytes, tx_data: bytes) -> bool:
+    """
+    [REQUIRED] Verify a P2PKH transaction directly without stack manipulation.
+
+    This is a simplified validation that checks:
+    1. The public key hashes to the expected hash (SHA256(pubkey) == expected_pubkey_hash)
+    2. The signature is valid for the given transaction data
+
+    Args:
+        signature: The signature bytes from scriptSig
+        pubkey: The public key bytes from scriptSig
+        expected_pubkey_hash: The pubkey hash from scriptPubKey (what the funds are locked to)
+        tx_data: The transaction data that was signed
+
+    Returns:
+        True if validation passes, False otherwise
+
+    Hint: Use sha256_hash() to hash the pubkey
+    Hint: Use VerifyKey(pubkey).verify(tx_data, signature) to check the signature
+    Hint: Wrap signature verification in try/except to catch BadSignatureError
+    """
+    # TODO: Implement verify_p2pkh
+    # Step 1: Check that sha256_hash(pubkey) == expected_pubkey_hash
+    # Step 2: Verify the signature using VerifyKey
     pass
 
 
@@ -63,12 +93,12 @@ class Script:
         """
         Create a P2PKH locking script (scriptPubKey).
 
-        Format: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
+        Format: OP_DUP OP_SHA256 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
 
         This script locks funds to a public key hash. To spend, the spender
         must provide a signature and public key that hashes to this value.
         """
-        return Script([OP_DUP, OP_HASH160, pub_key_hash, OP_EQUALVERIFY, OP_CHECKSIG])
+        return Script([OP_DUP, OP_SHA256, pub_key_hash, OP_EQUALVERIFY, OP_CHECKSIG])
 
     @staticmethod
     def p2pkh_unlocking_script(signature: str, pub_key: str) -> 'Script':
@@ -88,20 +118,22 @@ class Script:
 
 class ScriptInterpreter:
     """
-    Executes Bitcoin scripts on a stack.
+    [EXTRA CREDIT] Full stack-based Bitcoin script interpreter.
 
-    The interpreter processes each element:
+    Executes Bitcoin scripts on a stack. The interpreter processes each element:
     - Opcodes trigger operations on the stack
     - Data elements are pushed onto the stack
 
-    For P2PKH, the combined script executes as:
+    For P2PKH, the combined script (scriptSig + scriptPubKey) executes as:
     1. Push signature (from scriptSig)
     2. Push pubKey (from scriptSig)
-    3. OP_DUP: Duplicate pubKey
-    4. OP_HASH160: Hash the duplicated pubKey
-    5. Push expected pubKeyHash (from scriptPubKey)
-    6. OP_EQUALVERIFY: Verify hashes match
-    7. OP_CHECKSIG: Verify signature
+    3. OP_DUP: Duplicate pubKey → stack: [sig, pubKey, pubKey]
+    4. OP_SHA256: Hash top element → stack: [sig, pubKey, pubKeyHash]
+    5. Push expected pubKeyHash (from scriptPubKey) → stack: [sig, pubKey, pubKeyHash, expectedHash]
+    6. OP_EQUALVERIFY: Pop two, verify equal → stack: [sig, pubKey]
+    7. OP_CHECKSIG: Verify signature → stack: [true/false]
+
+    The script succeeds if the stack is non-empty and the top value is truthy.
     """
 
     def __init__(self):
@@ -136,13 +168,13 @@ class ScriptInterpreter:
         # TODO: Implement OP_DUP
         pass
 
-    def _op_hash160(self):
+    def _op_sha256(self):
         """
-        OP_HASH160: Replace top element with RIPEMD160(SHA256(element)).
+        OP_SHA256: Replace top element with SHA256(element).
 
-        Stack: [..., data] -> [..., hash160(data)]
+        Stack: [..., data] -> [..., sha256(data)]
         """
-        # TODO: Implement OP_HASH160
+        # TODO: Implement OP_SHA256
         pass
 
     def _op_equalverify(self) -> bool:

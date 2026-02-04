@@ -33,11 +33,15 @@ For transactions [A, B, C, D]:
 The root is stored in the block header. To prove C is in the block,
 you only need: [H(D), H(AB)] - just 2 hashes instead of 4 transactions!
 
-=== BITCOIN'S APPROACH ===
+=== OUR APPROACH ===
 
-Bitcoin uses double-SHA256 for Merkle hashing. If there's an odd number
-of elements at any level, the last element is duplicated.
+We use double-SHA256 for Merkle hashing. If there's an odd number of
+elements at any level, the missing right sibling is filled with zeros
+(a 32-byte zero hash represented as 64 hex characters).
 """
+
+# Zero hash used for padding when tree is unbalanced (32 bytes of zeros as hex)
+ZERO_HASH = '0' * 64
 
 
 def double_sha256(data: bytes) -> bytes:
@@ -74,7 +78,7 @@ def merkle_root(tx_hashes: List[str]) -> str:
     Algorithm:
     1. If empty list, return hash of empty string
     2. If single element, return it (it's the root)
-    3. If odd number of elements, duplicate the last one
+    3. If odd number of elements, pad with ZERO_HASH (not duplicate)
     4. Pair up elements and hash each pair
     5. Repeat until one hash remains (the root)
 
@@ -86,6 +90,7 @@ def merkle_root(tx_hashes: List[str]) -> str:
     """
     # TODO: Implement merkle_root
     # Hint: Use a while loop, processing pairs until only root remains
+    # Hint: If odd number of elements, append ZERO_HASH (not duplicate last)
     pass
 
 

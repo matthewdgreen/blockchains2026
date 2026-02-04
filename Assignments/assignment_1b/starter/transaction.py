@@ -1,7 +1,7 @@
 import hashlib
 from typing import List
 
-from script import Script, hash160, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG
+from script import Script, sha256_hash, OP_DUP, OP_SHA256, OP_EQUALVERIFY, OP_CHECKSIG
 
 DIFFICULTY = 0x07FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 BLOCK_REWARD = 50  # Coinbase reward for mining a block (in satoshis)
@@ -19,7 +19,7 @@ class Output:
     A transaction output with a locking script (scriptPubKey).
 
     The script_pubkey defines the conditions that must be met to spend this output.
-    For P2PKH, this is: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
+    For P2PKH, this is: OP_DUP OP_SHA256 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
     """
 
     def __init__(self, value: int, script_pubkey: Script):
@@ -35,7 +35,7 @@ class Output:
         and can only be spent by providing a valid signature from the corresponding
         private key.
         """
-        pub_key_hash = hash160(bytes.fromhex(pub_key)).hex()
+        pub_key_hash = sha256_hash(bytes.fromhex(pub_key)).hex()
         return Output(value, Script.p2pkh_locking_script(pub_key_hash))
 
     def to_bytes(self) -> bytes:
