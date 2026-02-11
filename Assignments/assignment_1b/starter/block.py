@@ -2,7 +2,7 @@ import hashlib
 from typing import Optional, List
 
 from transaction import Transaction, DIFFICULTY
-from merkle import merkle_root
+from merkle import build_merkle_tree
 
 """
 Block structure for the blockchain.
@@ -57,8 +57,8 @@ class Block:
 
     def get_merkle_root(self) -> str:
         """Compute the Merkle root of all transactions in the block."""
-        tx_hashes = [tx.number for tx in self.txs]
-        return merkle_root(tx_hashes)
+        tx_hashes = [tx.tx_hash for tx in self.txs]
+        return build_merkle_tree(tx_hashes)
 
     # Find a valid nonce such that the hash below is less than the DIFFICULTY
     # constant. Record the nonce as a hex-encoded string (bytearray.hex(), see

@@ -48,22 +48,22 @@ class Input:
     """
     A transaction input with an unlocking script (scriptSig).
 
-    The number refers to the transaction ID where the input was generated.
+    The tx_hash refers to the hash of the transaction where this input was created.
     The script_sig provides the data needed to satisfy the locking script.
     """
 
-    def __init__(self, output: Output, number: str, script_sig: Script = None):
+    def __init__(self, output: Output, tx_hash: str, script_sig: Script = None):
         self.output = output
-        self.number = number
+        self.tx_hash = tx_hash
         self.script_sig = script_sig if script_sig is not None else Script([])
 
     def to_bytes(self) -> bytes:
         """Serialize the input to bytes (including script_sig)."""
-        return self.output.to_bytes() + bytes.fromhex(self.number) + self.script_sig.to_bytes()
+        return self.output.to_bytes() + bytes.fromhex(self.tx_hash) + self.script_sig.to_bytes()
 
     def to_bytes_unsigned(self) -> bytes:
         """Serialize without the script_sig (for signing)."""
-        return self.output.to_bytes() + bytes.fromhex(self.number)
+        return self.output.to_bytes() + bytes.fromhex(self.tx_hash)
 
 
 class Transaction:
@@ -81,7 +81,12 @@ class Transaction:
     def __init__(self, inputs: List[Input], outputs: List[Output]):
         self.inputs = inputs
         self.outputs = outputs
-        self.update_number()
+        self.tx_hash = self.get_hash()
+
+    def get_hash(self) -> str:
+        """Compute the SHA256 hash of the serialized transaction."""
+        # TODO: Compute and return the SHA256 hash (hex string) of self.to_bytes()
+        pass
 
     @staticmethod
     def coinbase(miner_pub_key: str, reward: int = BLOCK_REWARD) -> 'Transaction':
@@ -101,11 +106,6 @@ class Transaction:
     def is_coinbase(self) -> bool:
         """Check if this is a coinbase transaction (no inputs)."""
         return len(self.inputs) == 0
-
-    def update_number(self):
-        """Set the transaction number to be SHA256 of self.to_bytes()."""
-        # TODO: Compute SHA256 hash of self.to_bytes() and store as hex string
-        pass
 
     def bytes_to_sign(self) -> str:
         """

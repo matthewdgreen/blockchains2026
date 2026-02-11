@@ -199,10 +199,10 @@ class Node:
         block_hash = int(block.hash(), 16)
         return block_hash <= DIFFICULTY
 
-    def find_transaction(self, blockchain: Blockchain, tx_number: str) -> Optional[Transaction]:
-        """Find a transaction by its number in the blockchain."""
+    def find_transaction(self, blockchain: Blockchain, tx_hash: str) -> Optional[Transaction]:
+        """Find a transaction by its hash in the blockchain."""
         for block in blockchain.chain:
             for tx in block.txs:
-                if tx.number == tx_number:
+                if tx.tx_hash == tx_hash:
                     return tx
         return None

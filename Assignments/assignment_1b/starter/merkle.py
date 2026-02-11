@@ -71,7 +71,7 @@ def merkle_parent(left: str, right: str) -> str:
     pass
 
 
-def merkle_root(tx_hashes: List[str]) -> str:
+def build_merkle_tree(tx_hashes: List[str]) -> str:
     """
     Compute the Merkle root of a list of transaction hashes.
 
@@ -88,7 +88,7 @@ def merkle_root(tx_hashes: List[str]) -> str:
     Returns:
         The Merkle root as a hex string
     """
-    # TODO: Implement merkle_root
+    # TODO: Implement build_merkle_tree
     # Hint: Use a while loop, processing pairs until only root remains
     # Hint: If odd number of elements, append ZERO_HASH (not duplicate last)
     pass
