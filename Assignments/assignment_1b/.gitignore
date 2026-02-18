@@ -3,3 +3,4 @@
 autograder.zip
 solution_submission.zip
 .DS_Store
+__pycache__/
