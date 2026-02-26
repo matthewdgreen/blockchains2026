@@ -22,7 +22,7 @@ def build_transaction(inputs: List[Input], outputs: List[Output], signing_key: S
     - Inputs and outputs must not be empty
     - All inputs must be spendable by the signing key (pub_key_hash matches)
     - Input values must equal output values
-    - No duplicate inputs (same txid)
+    - No duplicate inputs (same txid and output_index)
 
     Steps:
     1. Validate inputs and outputs
