@@ -52,18 +52,19 @@ class Input:
     The script_sig provides the data needed to satisfy the locking script.
     """
 
-    def __init__(self, output: Output, tx_hash: str, script_sig: Script = None):
+    def __init__(self, output: Output, tx_hash: str, output_index: int, script_sig: Script = None):
         self.output = output
         self.tx_hash = tx_hash
+        self.output_index = output_index
         self.script_sig = script_sig if script_sig is not None else Script([])
 
     def to_bytes(self) -> bytes:
         """Serialize the input to bytes (including script_sig)."""
-        return self.output.to_bytes() + bytes.fromhex(self.tx_hash) + self.script_sig.to_bytes()
+        return self.output.to_bytes() + bytes.fromhex(self.tx_hash) + self.output_index.to_bytes(4, 'big') + self.script_sig.to_bytes()
 
     def to_bytes_unsigned(self) -> bytes:
         """Serialize without the script_sig (for signing)."""
-        return self.output.to_bytes() + bytes.fromhex(self.tx_hash)
+        return self.output.to_bytes() + bytes.fromhex(self.tx_hash) + self.output_index.to_bytes(4, 'big')
 
 
 class Transaction:

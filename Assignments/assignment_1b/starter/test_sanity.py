@@ -29,7 +29,8 @@ constructs Input objects that reference specific UTXOs:
 
     Input(
         previous_tx.outputs[0],   # the Output being spent
-        previous_tx_id            # hash of the tx that created it
+        previous_tx_id,           # hash of the tx that created it
+        0                         # output index (which output in that tx)
     )
 
 Your Node code validates that these UTXOs actually exist and that the
@@ -110,7 +111,7 @@ def _build_and_sign(inputs, outputs, key):
     """
     from transaction import Transaction, Input
     from script import Script
-    unsigned_inputs = [Input(inp.output, inp.tx_hash, Script([])) for inp in inputs]
+    unsigned_inputs = [Input(inp.output, inp.tx_hash, inp.output_index, Script([])) for inp in inputs]
     unsigned_tx = Transaction(unsigned_inputs, outputs)
     tx_data = _tx_bytes_to_sign(unsigned_tx)
     signature = key.sign(tx_data).signature.hex()
@@ -118,7 +119,7 @@ def _build_and_sign(inputs, outputs, key):
     signed_inputs = []
     for inp in inputs:
         script_sig = Script.p2pkh_unlocking_script(signature, pub_key)
-        signed_inputs.append(Input(inp.output, inp.tx_hash, script_sig))
+        signed_inputs.append(Input(inp.output, inp.tx_hash, inp.output_index, script_sig))
     return Transaction(signed_inputs, outputs)
 
 
@@ -320,7 +321,7 @@ class TestPhase4_build_transaction(unittest.TestCase):
         fake_prev_txid = os.urandom(32).hex()
 
         tx = build_transaction(
-            [Input(existing_output, fake_prev_txid)],   # spend this UTXO
+            [Input(existing_output, fake_prev_txid, 0)],  # spend this UTXO
             [Output.p2pkh(10000, p2)],                  # send all to p2
             k1                                          # sign with k1
         )
@@ -385,7 +386,7 @@ class TestPhase5_build_block(unittest.TestCase):
         # This is what a wallet + mempool would do in real Bitcoin.
         # Here, we know exactly which UTXO exists because we just created it.
         tx = _build_and_sign(
-            [Input(genesis_coinbase.outputs[0], genesis_coinbase_txid)],
+            [Input(genesis_coinbase.outputs[0], genesis_coinbase_txid, 0)],
             [Output.p2pkh(10000, p2)],
             k1
         )
@@ -418,7 +419,7 @@ class TestPhase5_append(unittest.TestCase):
 
         # Build a block (uses YOUR build_block to validate + mine)
         tx = _build_and_sign(
-            [Input(genesis_coinbase.outputs[0], genesis_coinbase_txid)],
+            [Input(genesis_coinbase.outputs[0], genesis_coinbase_txid, 0)],
             [Output.p2pkh(10000, p2)],
             k1
         )
@@ -485,7 +486,7 @@ class TestPhase6_lifecycle(unittest.TestCase):
         #   - Create two Outputs: 30 to Bob + 20 to herself (change)
         #   - Input total (50) must equal Output total (30 + 20 = 50)
         tx1 = _build_and_sign(
-            [Input(coinbase_tx.outputs[0], coinbase_txid)],
+            [Input(coinbase_tx.outputs[0], coinbase_txid, 0)],
             [Output.p2pkh(30, bob_pub), Output.p2pkh(20, alice_pub)],
             alice_key
         )
@@ -503,7 +504,7 @@ class TestPhase6_lifecycle(unittest.TestCase):
         # ----- Bob sends his 30 to Carol -----
         # Bob references tx1.outputs[0] — the 30-coin UTXO created above.
         tx2 = _build_and_sign(
-            [Input(tx1.outputs[0], tx1_id)],
+            [Input(tx1.outputs[0], tx1_id, 0)],
             [Output.p2pkh(30, carol_pub)],
             bob_key
         )
@@ -542,7 +543,7 @@ class TestPhase6_lifecycle(unittest.TestCase):
 
         # Alice splits 50 into two UTXOs: 30 + 20 (both to herself)
         tx1 = _build_and_sign(
-            [Input(coinbase_tx.outputs[0], coinbase_txid)],
+            [Input(coinbase_tx.outputs[0], coinbase_txid, 0)],
             [Output.p2pkh(30, alice_pub), Output.p2pkh(20, alice_pub)],
             alice_key
         )
@@ -556,8 +557,8 @@ class TestPhase6_lifecycle(unittest.TestCase):
         # Alice combines both UTXOs into one transaction to pay Bob 50
         tx2 = _build_and_sign(
             [
-                Input(tx1.outputs[0], tx1_id),  # 30 coins
-                Input(tx1.outputs[1], tx1_id),  # 20 coins
+                Input(tx1.outputs[0], tx1_id, 0),  # 30 coins
+                Input(tx1.outputs[1], tx1_id, 1),  # 20 coins
             ],
             [Output.p2pkh(50, bob_pub)],        # 30 + 20 = 50
             alice_key

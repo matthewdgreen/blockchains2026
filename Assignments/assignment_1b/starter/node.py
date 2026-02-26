@@ -165,7 +165,7 @@ class Node:
         - Only allowed as the first transaction in a block
 
         For regular transactions:
-        1. Find the UTXO being spent for each input
+        1. Find the UTXO being spent for each input (match on txid, output_index, value, script)
         2. Extract signature and pubkey from scriptSig (input.script_sig.elements)
         3. Extract expected pubkey hash from scriptPubKey (input.output.script_pubkey.elements[2])
         4. Use verify_p2pkh() to validate the signature
@@ -182,6 +182,7 @@ class Node:
         #       - expected_hash = bytes.fromhex(input.output.script_pubkey.elements[2])
         #       - tx_data = bytes.fromhex(tx.bytes_to_sign())
         # Hint: Use verify_p2pkh(signature, pubkey, expected_hash, tx_data)
+        # Hint: Match UTXOs using txid and output_index (like Bitcoin's outpoint)
         pass
 
     def update_utxos(self, blockchain: Blockchain, tx: Transaction):
