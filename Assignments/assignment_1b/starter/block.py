@@ -54,6 +54,7 @@ class Block:
         self.txs = txs
         self.nonce = nonce
         self.prev = prev
+        self.pow = None
 
     def get_merkle_root(self) -> str:
         """Compute the Merkle root of all transactions in the block."""
@@ -66,6 +67,7 @@ class Block:
     def mine(self):
         # TODO: Implement mining
         # Hint: Increment nonce until hash() returns a value <= DIFFICULTY
+        # Hint: Once found, store the hash in self.pow
         pass
 
     # Hash the block header (prev + merkle_root + nonce)
