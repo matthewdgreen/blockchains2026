@@ -23,7 +23,9 @@ This is Phase 1 of a multi-part assignment. In later phases you will use your to
 
 ## Prerequisites
 
-- Node.js v20+ (`nvm install 20`)
+- Node.js v20+
+  - **macOS/Linux:** `nvm install 20` (install nvm from [nvm-sh/nvm](https://github.com/nvm-sh/nvm) if needed)
+  - **Windows:** Install [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) (download `nvm-setup.exe`), then open a new terminal and run `nvm install 20` followed by `nvm use 20`
 - A browser wallet (e.g., MetaMask)
 - Sepolia testnet ETH (see faucets below)
 
