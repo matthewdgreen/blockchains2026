@@ -1,7 +1,7 @@
 {
-  "name": "assignment-2-ethereum",
+  "name": "assignment-2-phase1",
   "version": "1.0.0",
-  "description": "JHU 601.641/441 - Assignment 2: Ethereum & ERC20 Tokens",
+  "description": "JHU 601.641/441 - Assignment 2 Phase 1: Ethereum & ERC20 Tokens",
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",

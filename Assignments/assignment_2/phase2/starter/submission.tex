@@ -1,0 +1,105 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+
+\title{Assignment 2: Ethereum --- Phase 2 Submission}
+\author{Blockchains and Cryptocurrencies (601.641/441) --- Spring 2026}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Student Information}
+
+\begin{tabular}{l l}
+\textbf{Name (string):} & \texttt{TODO: Firstname Lastname} \\[6pt]
+\textbf{JHED ID:}        & \texttt{TODO: abc123} \\
+\end{tabular}
+
+\section*{On-Chain Information}
+
+\begin{tabular}{l p{10cm}}
+\textbf{Wallet Address:}       & \texttt{TODO: 0x...} \\[6pt]
+\textbf{StudentToken Address:} & \texttt{TODO: 0x...} \\[6pt]
+\textbf{SimplePair Address:}   & \texttt{TODO: 0x...} \\[6pt]
+\textbf{Swap Tx Hash:}         & \texttt{TODO: 0x...} \\
+\end{tabular}
+
+\vspace{1em}
+
+\noindent\textbf{Note:} The TA will verify your submission by:
+\begin{enumerate}
+    \item Checking that your SimplePair contract is deployed and initialized with your StudentToken and the GOV token
+    \item Verifying the swap transaction executed successfully through your pair
+    \item Running the autograder against your \texttt{SimplePair.sol} source code
+\end{enumerate}
+
+\vspace{1em}
+
+\section*{Short Answer}
+
+\noindent\textbf{Q1:} The first liquidity provider receives $\sqrt{amountA \times amountB}$ LP tokens.
+
+\begin{itemize}
+    \item[(a)] Alice deposits 100 tokenA and 400 tokenB into an empty pool. How many LP tokens does she receive?
+    \item[(b)] Now suppose we used $amountA + amountB$ instead. Alice could deposit 1 tokenA and 499 tokenB (total = 500 LP tokens) instead of 100 and 400 (total = 500 LP tokens). Explain concretely what problem this creates for the pool and for future swappers.
+    \item[(c)] How does the geometric mean ($\sqrt{amountA \times amountB}$) fix this problem? What happens to Alice's LP token count if she tries the 1/499 split with the sqrt formula?
+\end{itemize}
+
+\vspace{5em}
+
+\noindent\textbf{Q2:} A pool has 10{,}000 tokenA and 10{,}000 tokenB. You swap 1{,}000 tokenA in. How many tokenB do you receive? Show your work using the constant product formula with the 0.3\% fee.
+
+\vspace{4em}
+
+\noindent\textbf{Q3:} Consider three AMM invariants:
+\begin{itemize}
+    \item \textbf{Constant sum:} $x + y = k$ \quad (always swaps 1:1)
+    \item \textbf{Constant product:} $x \cdot y = k$ \quad (Uniswap V2)
+    \item \textbf{StableSwap (Curve):} a hybrid that behaves like constant sum near the midpoint and like constant product at the extremes
+\end{itemize}
+
+\begin{itemize}
+    \item[(a)] A constant sum pool holds 10{,}000 USDC and 10{,}000 DAI. An attacker swaps in 10{,}000 DAI. What does the attacker receive? What is left in the pool? Explain why this makes the constant sum model broken as a general-purpose AMM.
+    \item[(b)] Now consider the same trade on a constant product pool ($k = 10{,}000 \times 10{,}000 = 10^8$). The attacker swaps in 10{,}000 DAI. Calculate how much USDC they receive (ignore fees). Why does the constant product model survive this attack?
+    \item[(c)] A USDC/USDT pool on Curve uses StableSwap. A user swaps 1{,}000 USDC for USDT. On Uniswap V2 (constant product) with the same reserves, the same swap yields fewer USDT due to slippage. Why does StableSwap give a better rate for stablecoin pairs, and why would it be \textit{dangerous} to use StableSwap for a volatile pair like ETH/USDC?
+\end{itemize}
+
+\vspace{5em}
+
+\noindent\textbf{Q4:} In the \texttt{SimpleFactory} contract, calling \texttt{createPair()} deploys a new \texttt{SimplePair} contract from within the factory.
+
+\begin{itemize}
+    \item[(a)] What EVM opcode is used when a smart contract deploys another smart contract using the \texttt{new} keyword in Solidity? How does this differ from the \texttt{CREATE2} opcode?
+    \item[(b)] Why would a protocol like Uniswap prefer \texttt{CREATE2} over \texttt{CREATE} for deploying pair contracts? \textit{Hint: think about what determines the deployed address in each case.}
+\end{itemize}
+
+\vspace{5em}
+
+\noindent\textbf{Q5:} \textit{Impermanent Loss} (IL).
+
+You deposit 1 ETH and 2{,}000 USDC into a constant product pool (ETH = \$2{,}000). The pool now has reserves $x = 1$ ETH and $y = 2{,}000$ USDC, so $k = 2{,}000$.
+
+The price of ETH rises to \$4{,}000. Arbitrageurs trade with the pool until the pool price matches the market price.
+
+\begin{itemize}
+    \item[(a)] After arbitrage, the pool price must satisfy $\frac{y}{x} = 4{,}000$ and $x \cdot y = 2{,}000$. Solve for the new reserves $x$ and $y$. \textit{(Show your algebra.)}
+    \item[(b)] Calculate the total USD value of your LP position using the new reserves from (a). Then calculate what your tokens would be worth if you had simply held 1 ETH + 2{,}000 USDC in your wallet. What is the impermanent loss in dollars and as a percentage?
+    \item[(c)] You earned 50 USDC in trading fees while providing liquidity. Does this fully offset the impermanent loss from (b)?
+    \item[(d)] You now withdraw your liquidity. Is the loss still ``impermanent''? Explain in 1--2 sentences when impermanent loss becomes a realized (permanent) loss.
+\end{itemize}
+
+\vspace{5em}
+
+\noindent\textbf{Q6:} Explain in 2--3 sentences why an AMM user cannot extract more of a token from the pool than was deposited into it.
+
+\vspace{4em}
+
+\end{document}

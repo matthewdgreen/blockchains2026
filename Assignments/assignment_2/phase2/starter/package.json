@@ -1,0 +1,20 @@
+{
+  "name": "assignment-2-phase2",
+  "version": "1.0.0",
+  "description": "JHU 601.641/441 - Assignment 2 Phase 2: Simplified Uniswap V2",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy:pair": "npx hardhat run scripts/deploy-pair.js --network sepolia",
+    "add-liquidity": "npx hardhat run scripts/add-liquidity.js --network sepolia",
+    "swap": "npx hardhat run scripts/swap.js --network sepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.22.0",
+    "dotenv": "^16.4.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}
