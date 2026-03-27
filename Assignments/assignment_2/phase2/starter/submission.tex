@@ -1,21 +1,46 @@
-\documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{hyperref}
-\usepackage{xcolor}
-\usepackage{amsmath}
+\documentclass{article}
+\usepackage{url,amsmath,setspace,amssymb,fullpage,color}
+\usepackage[
+n,
+operators,
+advantage,
+sets,
+adversary,
+landau,
+probability,
+notions,
+logic,
+ff,
+mm,
+primitives,
+events,
+complexity,
+asymptotics,
+keys, lambda]{cryptocode}
 
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    urlcolor=blue,
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 601.641/441 -- Blockchains and Cryptocurrencies} \hfill #2
+
+       {\centering \Large #5
+
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
 }
 
-\title{Assignment 2: Ethereum --- Phase 2 Submission}
-\author{Blockchains and Cryptocurrencies (601.641/441) --- Spring 2026}
-\date{}
+\newcommand{\scribe}[4]{\heading{#1}{#2}{}{ #4}{ #3}}
 
 \begin{document}
-\maketitle
+
+\heading{2}{Spring 2026}{Instructor: Matthew Green}{TA: Dorian Liu}{Assignment 2: Ethereum --- Phase 2 Submission}
 
 \section*{Student Information}
 
@@ -46,65 +71,81 @@
 
 \section*{Short Answer}
 
-\noindent\textbf{Q1:} The first liquidity provider receives $\sqrt{amountA \times amountB}$ LP tokens.
-
-\begin{itemize}
-    \item[(a)] Alice deposits 100 tokenA and 400 tokenB into an empty pool. How many LP tokens does she receive?
-    \item[(b)] Now suppose we used $amountA + amountB$ instead. Alice could deposit 1 tokenA and 499 tokenB (total = 500 LP tokens) instead of 100 and 400 (total = 500 LP tokens). Explain concretely what problem this creates for the pool and for future swappers.
-    \item[(c)] How does the geometric mean ($\sqrt{amountA \times amountB}$) fix this problem? What happens to Alice's LP token count if she tries the 1/499 split with the sqrt formula?
-\end{itemize}
-
-\vspace{5em}
-
-\noindent\textbf{Q2:} A pool has 10{,}000 tokenA and 10{,}000 tokenB. You swap 1{,}000 tokenA in. How many tokenB do you receive? Show your work using the constant product formula with the 0.3\% fee.
-
-\vspace{4em}
-
-\noindent\textbf{Q3:} Consider two AMM invariants:
-\begin{itemize}
-    \item \textbf{Constant sum:} $x + y = k$ \quad (always swaps 1:1)
-    \item \textbf{Constant product:} $x \cdot y = k$ \quad (Uniswap V2)
-\end{itemize}
-
-\begin{itemize}
-    \item[(a)] A constant sum pool holds 10{,}000 USDC and 10{,}000 DAI. An attacker swaps in 10{,}000 DAI. What does the attacker receive? What is left in the pool? Explain why this makes the constant sum model broken as a general-purpose AMM.
-    \item[(b)] Now consider the same trade on a constant product pool ($k = 10{,}000 \times 10{,}000 = 10^8$). The attacker swaps in 10{,}000 DAI. Calculate how much USDC they receive (ignore fees). Why does the constant product model survive this attack?
-\end{itemize}
-
-\vspace{5em}
-
-\noindent\textbf{Q4:} In this assignment you deployed your \texttt{SimplePair} directly from your wallet. In Uniswap V2, a \texttt{Factory} contract deploys each Pair on behalf of users.
-
-\begin{itemize}
-    \item[(a)] When a Solidity contract uses the \texttt{new} keyword to deploy another contract, what EVM opcode is used? How is the deployed address determined?
-    \item[(b)] Uniswap V2's Factory uses \texttt{CREATE2} instead. How is the deployed address determined with \texttt{CREATE2}, and why is this important? \textit{Hint: consider how a Router contract can find the pair address for a given token pair without querying the Factory.}
-    \item[(c)] Suppose two users both try to create a pair for the same token pair (tokenA/tokenB). Explain how \texttt{CREATE2} prevents duplicate pair contracts, while \texttt{CREATE} would not.
-\end{itemize}
-
-\vspace{5em}
-
-\noindent\textbf{Q5:} \textit{Impermanent Loss} (IL).
-
-\noindent You deposit 1 ETH and 2{,}000 USDC into a constant product pool (ETH = \$2{,}000). The pool now has reserves $x = 1$ ETH and $y = 2{,}000$ USDC, so $k = 2{,}000$.
-
-\noindent The price of ETH rises to \$4{,}000. Arbitrageurs trade with the pool until the pool price matches the market price.
-
-\begin{itemize}
-    \item[(a)] After arbitrage, the pool price must satisfy $\frac{y}{x} = 4{,}000$ and $x \cdot y = 2{,}000$. Solve for the new reserves $x$ and $y$. \textit{(Show your algebra.)}
-    \item[(b)] Calculate the total USD value of your LP position using the new reserves from (a). Then calculate what your tokens would be worth if you had simply held 1 ETH + 2{,}000 USDC in your wallet. What is the impermanent loss in dollars and as a percentage?
-    \item[(c)] You earned 50 USDC in trading fees while providing liquidity. Does this fully offset the impermanent loss from (b)?
-    \item[(d)] You now withdraw your liquidity. Is the loss still ``impermanent''? Explain in 1--2 sentences when impermanent loss becomes a realized (permanent) loss.
-\end{itemize}
-
-\vspace{5em}
-
-\noindent\textbf{Q6:} Uniswap V3 introduced several major upgrades over Uniswap V2. List \textbf{three} key upgrades. For each one:
-
 \begin{enumerate}
-    \item Explain \textit{why} the upgrade was needed (what limitation of V2 does it address?).
-    \item Provide simplified smart contract pseudocode illustrating how the V3 mechanism works.
-\end{enumerate}
 
-\vspace{5em}
+    \item \textbf{Q1:} The first liquidity provider receives $\sqrt{amountA \times amountB}$ LP tokens.
+
+    \begin{itemize}
+        \item[(a)] Alice deposits 100 tokenA and 400 tokenB into an empty pool. How many LP tokens does she receive?
+        \item[(b)] Now suppose we used $amountA + amountB$ instead. Alice could deposit 1 tokenA and 499 tokenB (total = 500 LP tokens) instead of 100 and 400 (total = 500 LP tokens). Explain concretely what problem this creates for the pool and for future swappers.
+        \item[(c)] How does the geometric mean ($\sqrt{amountA \times amountB}$) fix this problem? What happens to Alice's LP token count if she tries the 1/499 split with the sqrt formula?
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{3em}
+
+    \item \textbf{Q2:} A pool has 10{,}000 tokenA and 10{,}000 tokenB. You swap 1{,}000 tokenA in. How many tokenB do you receive? Show your work using the constant product formula with the 0.3\% fee.
+
+    \paragraph{Solution.}
+
+    \vspace{3em}
+
+    \item \textbf{Q3:} Consider two AMM invariants:
+    \begin{itemize}
+        \item \textbf{Constant sum:} $x + y = k$ \quad (always swaps 1:1)
+        \item \textbf{Constant product:} $x \cdot y = k$ \quad (Uniswap V2)
+    \end{itemize}
+
+    \begin{itemize}
+        \item[(a)] A constant sum pool holds 10{,}000 USDC and 10{,}000 DAI. An attacker swaps in 10{,}000 DAI. What does the attacker receive? What is left in the pool? Explain why this makes the constant sum model broken as a general-purpose AMM.
+        \item[(b)] Now consider the same trade on a constant product pool ($k = 10{,}000 \times 10{,}000 = 10^8$). The attacker swaps in 10{,}000 DAI. Calculate how much USDC they receive (ignore fees). Why does the constant product model survive this attack?
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{3em}
+
+    \item \textbf{Q4:} In this assignment you deployed your \texttt{SimplePair} directly from your wallet. In Uniswap V2, a \texttt{Factory} contract deploys each Pair on behalf of users.
+
+    \begin{itemize}
+        \item[(a)] When a Solidity contract uses the \texttt{new} keyword to deploy another contract, what EVM opcode is used? How is the deployed address determined?
+        \item[(b)] Uniswap V2's Factory uses \texttt{CREATE2} instead. How is the deployed address determined with \texttt{CREATE2}, and why is this important? \textit{Hint: consider how a Router contract can find the pair address for a given token pair without querying the Factory.}
+        \item[(c)] Suppose two users both try to create a pair for the same token pair (tokenA/tokenB). Explain how \texttt{CREATE2} prevents duplicate pair contracts, while \texttt{CREATE} would not.
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{3em}
+
+    \item \textbf{Q5:} \textit{Impermanent Loss} (IL).
+
+    \noindent You deposit 1 ETH and 2{,}000 USDC into a constant product pool (ETH = \$2{,}000). The pool now has reserves $x = 1$ ETH and $y = 2{,}000$ USDC, so $k = 2{,}000$.
+
+    \noindent The price of ETH rises to \$4{,}000. Arbitrageurs trade with the pool until the pool price matches the market price.
+
+    \begin{itemize}
+        \item[(a)] After arbitrage, the pool price must satisfy $\frac{y}{x} = 4{,}000$ and $x \cdot y = 2{,}000$. Solve for the new reserves $x$ and $y$. \textit{(Show your algebra.)}
+        \item[(b)] Calculate the total USD value of your LP position using the new reserves from (a). Then calculate what your tokens would be worth if you had simply held 1 ETH + 2{,}000 USDC in your wallet. What is the impermanent loss in dollars and as a percentage?
+        \item[(c)] You earned 50 USDC in trading fees while providing liquidity. Does this fully offset the impermanent loss from (b)?
+        \item[(d)] You now withdraw your liquidity. Is the loss still ``impermanent''? Explain in 1--2 sentences when impermanent loss becomes a realized (permanent) loss.
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{3em}
+
+    \item \textbf{Q6:} Uniswap V3 introduced several major upgrades over Uniswap V2. List \textbf{three} key upgrades. For each one:
+
+    \begin{enumerate}
+        \item Explain \textit{why} the upgrade was needed (what limitation of V2 does it address?).
+        \item Provide simplified smart contract pseudocode illustrating how the V3 mechanism works.
+    \end{enumerate}
+
+    \paragraph{Solution.}
+
+    \vspace{3em}
+
+\end{enumerate}
 
 \end{document}
