@@ -2,6 +2,8 @@
 
 **Course:** Blockchains and Cryptocurrencies (601.641/441) --- Spring 2026
 
+**Due Date:** Sunday, April 5, 2026, 11:59 PM ET
+
 ## Overview
 
 In this phase you will implement a **simplified Uniswap V2 pair contract** --- a constant-product automated market maker (AMM). Your contract enables trustless token swaps between your StudentToken (from Phase 1) and the TA's Governance Token (GOV) using the `x * y = k` invariant.
