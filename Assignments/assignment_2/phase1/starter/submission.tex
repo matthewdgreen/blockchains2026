@@ -1,0 +1,48 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+
+\title{Assignment 2: Ethereum --- Phase 1 Submission}
+\author{Blockchains and Cryptocurrencies (601.641/441) --- Spring 2026}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Student Information}
+
+\begin{tabular}{l l}
+\textbf{Name (string):} & \texttt{TODO: Firstname Lastname} \\[6pt]
+\textbf{JHED ID:}        & \texttt{TODO: abc123} \\
+\end{tabular}
+
+\section*{On-Chain Information}
+
+\begin{tabular}{l p{10cm}}
+\textbf{Wallet Address:} & \texttt{TODO: 0x...} \\[6pt]
+\textbf{Token Address:}  & \texttt{TODO: 0x...} \\[6pt]
+\textbf{Secret (uint256):} & \texttt{TODO: 42} \\
+\end{tabular}
+
+\vspace{1em}
+
+\noindent\textbf{Note:} The TA will verify your submission by computing:
+
+\begin{center}
+\texttt{keccak256(abi.encodePacked(name, secret))}
+\end{center}
+
+\noindent where \texttt{name} is a Solidity \texttt{string} and \texttt{secret} is a \texttt{uint256}. The result must match the \texttt{nameHash} stored in the Registry contract. Your name must match \textbf{exactly} (capitalization, spacing) as used when you registered.
+
+\vspace{1em}
+
+\noindent Registry Contract: \href{https://sepolia.etherscan.io/address/0x335f43d6CCFfF66F115D99819158A21c6c6efb10}{0x335f43d6CCFfF66F115D99819158A21c6c6efb10} (Sepolia)
+
+\end{document}

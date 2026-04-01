@@ -1,0 +1,8 @@
+solution/
+autograder/
+phase1/solution/
+phase1/autograder/
+phase2/solution/
+phase2/autograder/
+*.csv
+autograder_*.zip
