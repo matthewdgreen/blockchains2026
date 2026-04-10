@@ -6,7 +6,15 @@
 
 ## Overview
 
-In this phase you will exploit a vulnerability in a governance DAO deployed by the TA. The DAO controls grade assignment for the course --- only the designated TA address can call `setGrade()`. Your objective is to write a smart contract that manipulates the DAO's governance mechanism to set your own grade to 100.
+Welcome to the course DAO. As of Phase 2, every registered student holds GOV tokens --- which means you are all now members of our on-chain governance system. The GovernanceDAO contract controls grade assignment for this course: only the designated TA can call `setGrade()`.
+
+Here's the problem: the TA and CAs are swamped this semester and don't have time to grade your assignment. So we're going to let you do it yourselves. The GovernanceDAO has a `setGrade(student, grade)` function that records your grade on-chain (max 100). If you can figure out how to call it, the TA will simply read your grade from the blockchain. Saves everyone time.
+
+There's just one catch --- only the current TA address can call `setGrade()`, and that's not you. The DAO has a governance mechanism that *could* change the TA, but you'd need over 1,000,000 GOV votes to pass a proposal, and you only have 1,000 GOV. Good luck with that.
+
+Unless, of course, you find another way.
+
+**Your objective:** Set your own grade to 100 on-chain. The maximum grade is 100.
 
 **What you will learn:**
 - Flash loan mechanics and how they enable atomic arbitrage
@@ -35,9 +43,9 @@ A flash loan lets you borrow tokens with **no collateral**, as long as you repay
 ```
 ┌─────────── Single Transaction ───────────┐
 │                                          │
-│  1. Borrow 5,000,000 tokens              │
+│  1. Borrow 2,000,000 tokens              │
 │  2. Do something with them...            │
-│  3. Repay 5,000,000 tokens               │
+│  3. Repay 2,000,000 tokens               │
 │                                          │
 │  If step 3 fails → everything reverts    │
 └──────────────────────────────────────────┘
@@ -65,7 +73,7 @@ The same ERC20 token from Phase 2. It serves as the governance token for the DAO
 
 ### LendingPool
 
-Holds 5,000,000 GOV tokens and offers flash loans. When you call `flashLoan(amount)`:
+Holds 2,000,000 GOV tokens and offers flash loans. When you call `flashLoan(amount)`:
 
 1. The pool transfers `amount` GOV tokens to your contract
 2. The pool calls `onFlashLoan(amount)` on your contract (you must implement `IFlashLoanReceiver`)
@@ -102,6 +110,16 @@ constructor(address _lendingPool, address _dao, address _governanceToken)
 ```
 
 The test suite and deploy script expect this constructor signature. Beyond that, the internal design of your contract is up to you. Study the interfaces and the GovernanceDAO source code to find the vulnerability and figure out how to exploit it.
+
+### Recommended Workflow
+
+We recommend completing this assignment in the following order:
+
+1. **Answer Q1 and Q2 first** (Aave and Terra/LUNA in `submission.tex`). These questions build your understanding of lending protocols, flash loans, and how protocol design flaws lead to catastrophic failures.
+2. **Answer Q3** (Flash Loans). This directly prepares you for the coding portion --- you'll need to understand the callback mechanism to implement your exploit.
+3. **Implement `Attacker.sol`** and test locally with `npx hardhat test`.
+4. **Deploy to Sepolia** and verify with `check-status.js`.
+5. **Answer Q4** (Your Attack Sequence). Explain what you built and why it works.
 
 ### Success Criteria
 
