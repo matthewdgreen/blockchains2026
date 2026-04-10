@@ -1,0 +1,18 @@
+{
+  "name": "assignment-2-phase3",
+  "version": "1.0.0",
+  "description": "JHU 601.641/441 - Assignment 2 Phase 3: DAO & Flash Loan Exploit",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy": "npx hardhat run scripts/deploy-attacker.js --network sepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.22.0",
+    "dotenv": "^16.4.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}

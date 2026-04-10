@@ -1,0 +1,150 @@
+\documentclass{article}
+\usepackage{url,amsmath,setspace,amssymb,fullpage,color,hyperref}
+\usepackage[
+n,
+operators,
+advantage,
+sets,
+adversary,
+landau,
+probability,
+notions,
+logic,
+ff,
+mm,
+primitives,
+events,
+complexity,
+asymptotics,
+keys, lambda]{cryptocode}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 601.641/441 -- Blockchains and Cryptocurrencies} \hfill #2
+
+       {\centering \Large #5
+
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\scribe}[4]{\heading{#1}{#2}{}{ #4}{ #3}}
+
+\begin{document}
+
+\heading{3}{Spring 2026}{Instructor: Matthew Green}{TA: Dorian Liu}{Assignment 2: Ethereum --- Phase 3 Submission}
+
+\section*{Student Information}
+
+\begin{tabular}{l l}
+\textbf{Name (string):} & \texttt{TODO: Firstname Lastname} \\[6pt]
+\textbf{JHED ID:}        & \texttt{TODO: abc123} \\
+\end{tabular}
+
+\section*{On-Chain Information}
+
+\begin{tabular}{l p{10cm}}
+\textbf{Wallet Address:}        & \texttt{TODO: 0x...} \\[6pt]
+\textbf{Attacker Contract:}     & \texttt{TODO: 0x...} \\[6pt]
+\textbf{Attack Tx Hash:}        & \texttt{TODO: 0x...} \\
+\end{tabular}
+
+\vspace{1em}
+
+\noindent\textbf{Note:} The TA will verify your submission by:
+\begin{enumerate}
+    \item Checking that \texttt{dao.grades(yourAddress)} returns 100 on Sepolia
+    \item Checking that \texttt{dao.ta()} returns your address on Sepolia
+    \item Verifying the attack transaction executed successfully in a single transaction
+    \item Running the autograder against your \texttt{Attacker.sol} source code
+\end{enumerate}
+
+\vspace{1em}
+
+\section*{Short Answer}
+
+\begin{enumerate}
+
+    %% ============================================================
+    %% Q1: Aave Lending Protocol
+    %% ============================================================
+    \item \textbf{Q1: Aave Lending Protocol.}
+
+    Aave is one of the largest decentralized lending protocols in DeFi. Read about Aave's architecture and answer the following.
+
+    \begin{itemize}
+        \item[(a)] In Aave, lenders deposit assets and receive \textbf{aTokens} (e.g., depositing USDC gives you aUSDC). Explain how aTokens represent a lender's position. How does a lender earn interest --- does someone call a function to update their balance, or does it happen automatically? Explain the mechanism.
+        \item[(b)] Aave supports both \textbf{overcollateralized borrowing} and \textbf{flash loans}. Compare the two: who provides the safety guarantee in each case, and what happens when the guarantee is violated? (i.e., what happens when a borrower's collateral drops below the threshold vs.\ when a flash loan is not repaid?)
+        \item[(c)] Aave uses a \textbf{health factor} to determine when a position should be liquidated. If a user deposits 10 ETH (at \$2,000/ETH) with a liquidation threshold of 80\%, and borrows \$12,000 USDC:
+        \begin{enumerate}
+            \item What is their health factor? (Formula: $H = \frac{\text{collateral} \times \text{liquidation threshold}}{\text{debt}}$)
+            \item At what ETH price does the position become liquidatable ($H < 1$)?
+            \item Why do liquidators receive a bonus (typically 5--10\%) for liquidating unhealthy positions? What would happen without this incentive?
+        \end{enumerate}
+        \item[(d)] Aave V3 introduced \textbf{Efficiency Mode (E-Mode)} which allows higher loan-to-value ratios for correlated assets (e.g., borrowing USDC against DAI at 97\% LTV instead of the usual 75\%). Why is it safer to allow higher leverage for correlated assets? What risk remains even for stablecoin-to-stablecoin borrowing?
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{4em}
+
+    %% ============================================================
+    %% Q2: Terra/LUNA Collapse
+    %% ============================================================
+    \item \textbf{Q2: The Terra/LUNA Collapse.}
+
+    In May 2022, the Terra ecosystem collapsed, wiping out approximately \$40 billion in value. Read about the Terra/LUNA collapse and answer the following.
+
+    \begin{itemize}
+        \item[(a)] Explain how TerraUSD (UST) maintained its \$1 peg under normal conditions. What was the role of LUNA in the mint/burn mechanism?
+        \item[(b)] Describe the \textbf{death spiral} that occurred in May 2022. What triggered the initial depeg, and how did the mint/burn mechanism make it worse instead of restoring the peg?
+        \item[(c)] Compare UST's algorithmic stability mechanism to a \textbf{collateralized stablecoin} like DAI (MakerDAO). What fundamental design difference explains why DAI survived market crashes that killed UST?
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{4em}
+
+    %% ============================================================
+    %% Q3: Flash Loans
+    %% ============================================================
+    \item \textbf{Q3: Flash Loans.}
+
+    \begin{itemize}
+        \item[(a)] Explain how a flash loan works at a high level. What makes it different from a traditional loan? Why is no collateral required?
+        \item[(b)] A flash loan borrower calls \texttt{flashLoan(1000000)}. Walk through what happens step-by-step inside the \texttt{LendingPool} contract, including the callback mechanism. What happens if the borrower does not repay?
+        \item[(c)] Name two legitimate (non-exploit) use cases for flash loans in DeFi.
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{4em}
+
+    %% ============================================================
+    %% Q4: Your Attack
+    %% ============================================================
+    \item \textbf{Q4: Your Attack Sequence.}
+
+    Describe the exploit you implemented in your \texttt{Attacker.sol} contract.
+
+    \begin{itemize}
+        \item[(a)] What is the vulnerability in the \texttt{GovernanceDAO} contract? Which function is buggy, and why? How would a secure implementation differ?
+        \item[(b)] List the exact sequence of contract calls your \texttt{Attacker} makes during the \texttt{onFlashLoan} callback, in order. For each call, explain why it is necessary and what state it changes.
+        \item[(c)] Why must the entire exploit happen within a single transaction? What would go wrong if the steps were split across multiple transactions?
+    \end{itemize}
+
+    \paragraph{Solution.}
+
+    \vspace{4em}
+
+\end{enumerate}
+
+\end{document}

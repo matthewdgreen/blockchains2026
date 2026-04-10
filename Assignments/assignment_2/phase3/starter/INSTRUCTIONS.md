@@ -1,0 +1,196 @@
+# Assignment 2 --- Phase 3: DAO Governance Exploit
+
+**Course:** Blockchains and Cryptocurrencies (601.641/441) --- Spring 2026
+
+**Due Date:** TBD
+
+## Overview
+
+In this phase you will exploit a vulnerability in a governance DAO deployed by the TA. The DAO controls grade assignment for the course --- only the designated TA address can call `setGrade()`. Your objective is to write a smart contract that manipulates the DAO's governance mechanism to set your own grade to 100.
+
+**What you will learn:**
+- Flash loan mechanics and how they enable atomic arbitrage
+- How delegation-based governance works (and how it can go wrong)
+- Why real-world DAOs like Compound and Uniswap use historical balance snapshots
+- Writing multi-step exploit contracts that execute atomically
+- The Beanstalk-style governance attack vector
+
+## Background
+
+### Governance DAOs
+
+Decentralized Autonomous Organizations (DAOs) allow token holders to govern a protocol through on-chain voting. A typical governance flow works like this:
+
+1. A token holder **delegates** their voting power (often to themselves)
+2. Anyone with enough voting power can **propose** an action
+3. Token holders **vote** on the proposal
+4. If the proposal reaches **quorum** (enough votes), it can be **executed**
+
+The executed proposal calls a function on a target contract --- for example, changing a protocol parameter or granting a role.
+
+### Flash Loans
+
+A flash loan lets you borrow tokens with **no collateral**, as long as you repay them within the same transaction. If repayment fails, the entire transaction reverts as if nothing happened.
+
+```
+┌─────────── Single Transaction ───────────┐
+│                                          │
+│  1. Borrow 5,000,000 tokens              │
+│  2. Do something with them...            │
+│  3. Repay 5,000,000 tokens               │
+│                                          │
+│  If step 3 fails → everything reverts    │
+└──────────────────────────────────────────┘
+```
+
+Flash loans are a legitimate DeFi primitive used for arbitrage, liquidations, and collateral swaps. But they have also been used to exploit governance protocols with weak voting mechanisms.
+
+### Real-World Precedent: Beanstalk (April 2022)
+
+In April 2022, an attacker exploited Beanstalk Farms' governance system using a flash loan. The attacker borrowed a massive amount of tokens, used them to gain governance power, passed a malicious proposal, and drained $182 million from the protocol --- all in a single transaction. The root cause: the governance system measured voting power based on current token holdings rather than historical snapshots.
+
+## Deployed Contracts (Sepolia)
+
+The TA has deployed three contracts on Sepolia:
+
+| Contract | Address |
+|----------|---------|
+| GovernanceToken (GOV) | `0x4e6081534784F6A2EdC5455713F163B05a03466d` |
+| LendingPool | `0x781d5a896FB5E5C31359F47EB6774816fbdd2ff9` |
+| GovernanceDAO | `0x4Bc1EeBFec45EF87EDbd700A475a53Eae5E9E5E1` |
+
+### GovernanceToken (GOV)
+
+The same ERC20 token from Phase 2. It serves as the governance token for the DAO and as the asset available for flash loans in the LendingPool.
+
+### LendingPool
+
+Holds 5,000,000 GOV tokens and offers flash loans. When you call `flashLoan(amount)`:
+
+1. The pool transfers `amount` GOV tokens to your contract
+2. The pool calls `onFlashLoan(amount)` on your contract (you must implement `IFlashLoanReceiver`)
+3. After your callback returns, the pool verifies its balance is at least what it was before
+
+If the balance check fails, the entire transaction reverts.
+
+### GovernanceDAO
+
+A delegation-based governance contract. Key functions:
+
+- **`delegate(delegatee)`** --- Records your current GOV balance as voting power for the delegatee. Each address can only delegate once.
+- **`propose(description, target, data)`** --- Creates a proposal to call `target` with `data`. Requires voting power.
+- **`vote(proposalId)`** --- Votes in favor of a proposal using your voting power.
+- **`execute(proposalId)`** --- Executes a proposal if it has reached quorum (1,000,000 GOV votes).
+- **`setTA(newTA)`** --- Changes the TA address. Can only be called by the DAO itself (i.e., via a governance proposal).
+- **`setGrade(student, grade)`** --- Sets a student's grade. Can only be called by the current TA.
+
+Read `contracts/interfaces/IGovernanceDAO.sol` and `contracts/interfaces/ILendingPool.sol` for the complete interface specifications.
+
+## Your Task
+
+### Implement `Attacker.sol`
+
+Create `contracts/Attacker.sol` that implements the `IAttacker` interface (see `contracts/interfaces/IAttacker.sol`). Your contract must:
+
+1. **Set your grade to 100** in the GovernanceDAO
+2. **Complete everything in a single transaction** (the `attack()` call)
+3. **Not drain the LendingPool** --- all borrowed tokens must be repaid
+
+Your constructor must accept three addresses in this order:
+```solidity
+constructor(address _lendingPool, address _dao, address _governanceToken)
+```
+
+The test suite and deploy script expect this constructor signature. Beyond that, the internal design of your contract is up to you. Study the interfaces and the GovernanceDAO source code to find the vulnerability and figure out how to exploit it.
+
+### Success Criteria
+
+After your `attack()` transaction succeeds:
+- `dao.grades(yourAddress)` returns `100`
+- `dao.ta()` returns your address
+- The LendingPool's GOV balance is unchanged
+
+## Setup
+
+```bash
+cd Assignments/assignment_2/phase3/starter
+nvm use 20
+npm install
+```
+
+Copy `.env.example` to `.env` and fill in:
+```bash
+cp .env.example .env
+```
+
+Required `.env` values:
+```
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
+PRIVATE_KEY=your_private_key
+GOV_TOKEN_ADDRESS=0x4e6081534784F6A2EdC5455713F163B05a03466d
+LENDING_POOL_ADDRESS=0x781d5a896FB5E5C31359F47EB6774816fbdd2ff9
+DAO_ADDRESS=0x4Bc1EeBFec45EF87EDbd700A475a53Eae5E9E5E1
+```
+
+## File Structure
+
+```
+contracts/
+  interfaces/
+    IAttacker.sol         - Interface your contract must implement
+    IGovernanceDAO.sol    - GovernanceDAO interface (READ THIS)
+    ILendingPool.sol      - LendingPool + IFlashLoanReceiver interfaces (READ THIS)
+  GovernanceDAO.sol       - DAO contract with a vulnerability (READ THIS)
+  GovernanceToken.sol     - GOV token (for local testing)
+  LendingPool.sol         - Flash loan pool (for local testing)
+  Attacker.sol            - YOUR IMPLEMENTATION (create this file)
+scripts/
+  deploy-attacker.js      - Deploy your Attacker and run the exploit on Sepolia
+test/
+  Attacker.test.js        - Local tests for your exploit
+```
+
+## Testing Locally
+
+Run the provided tests to verify your exploit works:
+
+```bash
+npx hardhat test
+```
+
+All 4 tests should pass before deploying to Sepolia.
+
+## Deploying to Sepolia
+
+Once your local tests pass, deploy and execute the exploit on Sepolia:
+
+```bash
+npx hardhat run scripts/deploy-attacker.js --network sepolia
+```
+
+This deploys your Attacker contract and calls `attack()`. If successful, you will see your new grade printed in the output.
+
+**Note:** If your exploit reverts on-chain, the transaction fails atomically --- no state changes persist. You can fix your contract and redeploy as many times as needed.
+
+## Submission
+
+Upload your `Attacker.sol` to **Gradescope** under **Assignment 2 - Phase 3**.
+
+### What is graded
+
+| Test | Points | Description |
+|------|--------|-------------|
+| Compilation | 2 | Contract compiles without errors |
+| Grade set | 4 | `dao.grades(student)` is 100 after `attack()` |
+| TA changed | 4 | `dao.ta()` is the student's address after `attack()` |
+| Single transaction | 2 | Exploit completes in one `attack()` call |
+| Pool not drained | 2 | LendingPool balance unchanged after exploit |
+| **Total** | **14** | |
+
+## Resources
+
+- [Beanstalk Governance Exploit (Rekt News)](https://rekt.news/beanstalk-rekt/)
+- [Flash Loans (Aave Documentation)](https://docs.aave.com/developers/guides/flash-loans)
+- [OpenZeppelin Governor (secure governance)](https://docs.openzeppelin.com/contracts/5.x/governance)
+- [ERC20Votes --- snapshot-based voting](https://docs.openzeppelin.com/contracts/5.x/api/token/erc20#ERC20Votes)
+- [Solidity by Example --- ABI Encoding](https://solidity-by-example.org/abi-encode/)
