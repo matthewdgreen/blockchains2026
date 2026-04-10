@@ -45,9 +45,11 @@ describe("Phase 3: Flash Loan Exploit", function () {
     expect(await dao.ta()).to.equal(student.address);
   });
 
-  it("should set the student's grade to 100", async function () {
+  it("should set the student's grade to a value between 1 and 100", async function () {
     await attacker.connect(student).attack();
-    expect(await dao.grades(student.address)).to.equal(100);
+    const grade = await dao.grades(student.address);
+    expect(grade).to.be.gte(1);
+    expect(grade).to.be.lte(100);
   });
 
   it("should not drain the lending pool", async function () {
@@ -63,6 +65,8 @@ describe("Phase 3: Flash Loan Exploit", function () {
     const receipt = await tx.wait();
     expect(receipt.status).to.equal(1);
     expect(await dao.ta()).to.equal(student.address);
-    expect(await dao.grades(student.address)).to.equal(100);
+    const grade = await dao.grades(student.address);
+    expect(grade).to.be.gte(1);
+    expect(grade).to.be.lte(100);
   });
 });

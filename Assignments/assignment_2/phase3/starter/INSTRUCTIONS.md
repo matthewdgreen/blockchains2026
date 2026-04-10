@@ -14,7 +14,7 @@ There's just one catch --- only the current TA address can call `setGrade()`, an
 
 Unless, of course, you find another way.
 
-**Your objective:** Set your own grade to 100 on-chain. The maximum grade is 100.
+**Your objective:** Set your own grade on-chain. You can choose any grade from 0 to 100.
 
 **What you will learn:**
 - Flash loan mechanics and how they enable atomic arbitrage
@@ -100,7 +100,7 @@ Read `contracts/interfaces/IGovernanceDAO.sol` and `contracts/interfaces/ILendin
 
 Create `contracts/Attacker.sol` that implements the `IAttacker` interface (see `contracts/interfaces/IAttacker.sol`). Your contract must:
 
-1. **Set your grade to 100** in the GovernanceDAO
+1. **Set your grade (0--100)** in the GovernanceDAO
 2. **Complete everything in a single transaction** (the `attack()` call)
 3. **Not drain the LendingPool** --- all borrowed tokens must be repaid
 
@@ -124,7 +124,7 @@ We recommend completing this assignment in the following order:
 ### Success Criteria
 
 After your `attack()` transaction succeeds:
-- `dao.grades(yourAddress)` returns `100`
+- `dao.grades(yourAddress)` returns your chosen grade (0--100)
 - `dao.ta()` returns your address
 - The LendingPool's GOV balance is unchanged
 
@@ -199,7 +199,7 @@ Upload your `Attacker.sol` to **Gradescope** under **Assignment 2 - Phase 3**.
 | Test | Points | Description |
 |------|--------|-------------|
 | Compilation | 2 | Contract compiles without errors |
-| Grade set | 4 | `dao.grades(student)` is 100 after `attack()` |
+| Grade set | 4 | `dao.grades(student)` is between 1--100 after `attack()` |
 | TA changed | 4 | `dao.ta()` is the student's address after `attack()` |
 | Single transaction | 2 | Exploit completes in one `attack()` call |
 | Pool not drained | 2 | LendingPool balance unchanged after exploit |

@@ -35,10 +35,10 @@ async function main() {
   console.log("Proposals:     ", (await dao.proposalCount()).toString());
   console.log("");
 
-  if (grade === 100n && isTA) {
-    console.log("Result: PASS - Exploit successful! Grade is 100 and you are the TA.");
-  } else if (grade === 100n) {
-    console.log("Result: PARTIAL - Grade is 100 but you are not the TA.");
+  if (grade >= 1n && grade <= 100n && isTA) {
+    console.log(`Result: PASS - Exploit successful! Grade is ${grade} and you are the TA.`);
+  } else if (grade >= 1n && grade <= 100n) {
+    console.log(`Result: PARTIAL - Grade is ${grade} but you are not the TA.`);
   } else {
     console.log("Result: INCOMPLETE - Exploit not yet successful.");
   }

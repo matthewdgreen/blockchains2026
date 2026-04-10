@@ -57,8 +57,8 @@ async function main() {
   // Verify success
   const newTA = await dao.ta();
   const grade = await dao.grades(attacker.address);
-  if (newTA === attacker.address && grade === 100n) {
-    console.log("\nExploit successful! You are the TA with grade 100.");
+  if (newTA === attacker.address && grade >= 1n && grade <= 100n) {
+    console.log(`\nExploit successful! You are the TA with grade ${grade}.`);
   } else {
     console.log("\nExploit failed. Check your Attacker contract logic.");
   }
