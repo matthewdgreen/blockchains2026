@@ -2,7 +2,7 @@
 
 **Course:** Blockchains and Cryptocurrencies (601.641/441) - Spring 2026
 
-**Due Date:** TBD
+**Due Date:** Saturday, April 26, 2026, 11:59 PM ET
 
 ## Overview
 
@@ -98,7 +98,18 @@ Read `contracts/interfaces/IGovernanceDAO.sol` and `contracts/interfaces/ILendin
 
 ### Implement `Attacker.sol`
 
-Create `contracts/Attacker.sol` that implements the `IAttacker` interface (see `contracts/interfaces/IAttacker.sol`). Your contract must:
+Create `contracts/Attacker.sol` that implements the `IAttacker` interface (see `contracts/interfaces/IAttacker.sol`). Your contract must implement:
+
+```solidity
+// Entry point for your exploit. Must complete in a single transaction.
+function attack() external;
+
+// Callback invoked by LendingPool during a flash loan.
+// You must repay the full loan amount before this function returns.
+function onFlashLoan(uint256 amount) external;
+```
+
+Your contract must also:
 
 1. **Set your grade (0-100)** in the GovernanceDAO
 2. **Complete everything in a single transaction** (the `attack()` call)
@@ -199,9 +210,10 @@ npx hardhat run scripts/check-status.js --network sepolia
 
 ## Submission
 
-Upload your `Attacker.sol` to **Gradescope** under **Assignment 2 - Phase 3**.
+Submit the following to **Gradescope** under **Assignment 2 - Phase 3**:
 
-Also fill in `submission.tex`, compile to PDF, and upload alongside your contract.
+1. **Autograder submission:** Upload your `Attacker.sol` file only. The autograder will compile and test your contract automatically.
+2. **Written submission:** Fill in `submission.tex`, compile to PDF, and upload separately.
 
 ### What is graded
 
